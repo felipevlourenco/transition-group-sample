@@ -1,26 +1,55 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import Toolbar from './components/Toolbar/Toolbar'
+import Item from './components/Item/Item'
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
+import './App.css'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      items: []
+    }
+  }
+
+  addItemHandler = itemName => {
+    const newItem = {
+      name: itemName,
+      id: +new Date()
+    }
+    this.setState({
+      items: this.state.items.concat(newItem)
+    })
+  }
+
+  removeItemHandler = index => {
+    const newItems = [...this.state.items]
+    newItems.splice(index, 1)
+    this.setState({ items: newItems })
+  }
+
+  render() {
+    const itemsList = this.state.items.map((item, index) => (
+      <CSSTransition key={item.id} timeout={500} classNames="move">
+        <Item
+          key={item.id}
+          name={item.name}
+          onDelete={() => this.removeItemHandler(index)}
+        />
+      </CSSTransition>
+    ))
+
+    return (
+      <div className="App">
+        <div className="items-section">
+          <Toolbar onAddHandle={this.addItemHandler} />
+          <TransitionGroup className="items-section__list">
+            {itemsList}
+          </TransitionGroup>
+        </div>
+      </div>
+    )
+  }
 }
 
-export default App;
+export default App
